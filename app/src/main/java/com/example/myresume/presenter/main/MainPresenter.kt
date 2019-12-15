@@ -1,8 +1,8 @@
 package com.example.myresume.presenter.main
 
-import android.util.Log
 import com.example.myresume.eventbus.RxBus
 import com.example.myresume.eventbus.events.ResumeLoadedEvent
+import com.example.myresume.eventbus.events.errors.NetworkErrorEvent
 import com.example.myresume.model.ResumeSection
 import com.example.myresume.model.interfaces.SharedPreferencesRepository
 import com.example.myresume.presenter.EventPresenter
@@ -12,7 +12,6 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-
 import javax.inject.Inject
 
 /**
@@ -24,14 +23,14 @@ class MainPresenter
     //region Fields & Variables
 
     // Shared Preferences
-    @set:Inject
-    internal var sharedPreferences: SharedPreferencesRepository? = null
+    @Inject
+    internal lateinit var sharedPreferences: SharedPreferencesRepository
 
-    @set:Inject
-    internal var resumeService: ResumeService? = null
+    @Inject
+    internal lateinit var resumeService: ResumeService
 
     // Main View
-    private var mainView: MainView? = null
+    private lateinit var mainView: MainView
 
     /**
      * Get all resume sections observer
@@ -48,8 +47,7 @@ class MainPresenter
             }
 
             override fun onError(e: Throwable) {
-                Log.e(TAG, "onError: " + e.message, e)
-                mainView!!.showError("Resume load error")
+                rxBus.post(NetworkErrorEvent("Resume load error", this.javaClass.name))
             }
 
             override fun onComplete() {
@@ -62,10 +60,10 @@ class MainPresenter
 
     /**
      * Assign the view
-     * @param mainView The activity that implements MainView
+     * @param v The activity that implements MainView
      */
-    override fun setView(mainView: MainView) {
-        this.mainView = mainView
+    override fun setView(v: MainView) {
+        this.mainView = v
     }
 
     /**
@@ -79,8 +77,7 @@ class MainPresenter
      * Called when onResume is done
      */
     override fun resume() {
-        mainView!!.setRefreshing(true)
-        fetchResume()
+        refreshListRequested()
     }
 
     /**
@@ -101,20 +98,25 @@ class MainPresenter
      * Called when user requests resume update
      */
     override fun refreshListRequested() {
-        mainView!!.setRefreshing(true)
+        mainView.setRefreshing(true)
         fetchResume()
     }
 
+    override fun onNetworkError(message: String) {
+        mainView.setRefreshing(false)
+        mainView.showError(message)
+    }
+
     override fun onResumeLoadedEvent(resume: Array<ResumeSection>) {
-        mainView!!.renderResume(resume)
-        mainView!!.setRefreshing(false)
+        mainView.renderResume(resume)
+        mainView.setRefreshing(false)
     }
 
     /**
      * Calls the gist api to get the resume sections, and sends an event with the results
      */
     private fun fetchResume() {
-        resumeService!!.resume
+        resumeService.resume
             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .subscribe(resumeObserver)
     }

@@ -7,7 +7,7 @@ import io.reactivex.subjects.PublishSubject
 /**
  * RxJava Event Bus Class
  */
-class RxBus {
+open class RxBus {
     /**
      * Subscription subject
      */

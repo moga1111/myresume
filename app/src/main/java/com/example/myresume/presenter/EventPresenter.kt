@@ -21,7 +21,7 @@ protected constructor(// RxBus instance that is set by child classes via super()
     val rxBus: RxBus
 ) {
 
-    private var eventsSubscription: Disposable? = null
+    private lateinit var eventsSubscription: Disposable
 
     init {
         subscribe()
@@ -43,8 +43,8 @@ protected constructor(// RxBus instance that is set by child classes via super()
      * Unsubscribe from the event bus
      */
     protected fun unsubscribe() {
-        if (eventsSubscription != null && !eventsSubscription!!.isDisposed) {
-            eventsSubscription!!.dispose()
+        if (!eventsSubscription.isDisposed) {
+            eventsSubscription.dispose()
         }
     }
 
@@ -58,7 +58,7 @@ protected constructor(// RxBus instance that is set by child classes via super()
         override fun accept(o: EventObject) {
 
             if (o is NetworkErrorEvent) {
-                onNetworkError()
+                onNetworkError(o.message)
                 Util.log(
                     Util.LoggerLevel.INFO,
                     TAG,
@@ -81,9 +81,9 @@ protected constructor(// RxBus instance that is set by child classes via super()
     /**
      * Invoked when there is a network error
      */
-    protected fun onNetworkError() {}
+    protected abstract fun onNetworkError(message: String)
 
-    protected open fun onResumeLoadedEvent(resume: Array<ResumeSection>) {}
+    protected abstract fun onResumeLoadedEvent(resume: Array<ResumeSection>)
 
     companion object {
         // EventPresenter Tag

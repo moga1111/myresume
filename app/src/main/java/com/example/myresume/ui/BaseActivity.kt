@@ -14,7 +14,7 @@ import com.example.myresume.R
 abstract class BaseActivity : AppCompatActivity() {
 
     // Common toolbar
-    protected var toolbar: Toolbar? = null
+    protected lateinit var toolbar: Toolbar
 
     /**
      * Layout resource required to reference toolbar
@@ -35,9 +35,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun initViews() {
         toolbar = findViewById(R.id.toolbar)
-        if (toolbar != null) {
-            setSupportActionBar(toolbar)
-        }
+        setSupportActionBar(toolbar)
     }
     //endregion
 

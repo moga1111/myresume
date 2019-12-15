@@ -23,8 +23,7 @@ class MainApplication : Application() {
      * Application Component Getter
      * @return the application component
      */
-    var component: ApplicationComponent? = null
-        private set
+    lateinit var component: ApplicationComponent
     //endregion
 
     //region Life Cycle Methods

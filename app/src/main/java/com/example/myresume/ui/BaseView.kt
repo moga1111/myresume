@@ -18,20 +18,4 @@ interface BaseView {
      * @param errorMessage Error message text
      */
     fun showError(errorMessage: String)
-
-    /**
-     * Hides displayed error message
-     */
-    fun hideError()
-
-    /**
-     * Displays progress with message
-     * @param progressMessage Progress message text
-     */
-    fun showProgress(progressMessage: String?)
-
-    /**
-     * Hide displayed progress
-     */
-    fun hideProgress()
 }

@@ -21,13 +21,13 @@ import javax.inject.Inject
 class MainActivity : BaseActivity(), MainView {
 
     //region Fields & Variables
-    private var recyclerView: RecyclerView? = null
-    private var swipeRefreshLayout: SwipeRefreshLayout? = null
-    private var resumeAdapter: ResumeAdapter? = null
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var resumeAdapter: ResumeAdapter
 
     // Main Presenter
-    @set:Inject
-    internal var mainPresenter: MainViewPresenter? = null
+    @Inject
+    internal lateinit var mainPresenter: MainViewPresenter
 
     /**
      * Layout resource required to reference toolbar
@@ -41,27 +41,27 @@ class MainActivity : BaseActivity(), MainView {
     //region Life Cycle Methods
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainPresenter!!.load()
+        mainPresenter.load()
     }
 
     override fun onResume() {
         super.onResume()
-        mainPresenter!!.resume()
+        mainPresenter.resume()
     }
 
     override fun onPause() {
-        mainPresenter!!.pause()
+        mainPresenter.pause()
         super.onPause()
     }
 
     override fun onStop() {
-        mainPresenter!!.finish()
+        mainPresenter.finish()
         super.onStop()
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        mainPresenter!!.finish()
+        mainPresenter.finish()
     }
 
     //endregion
@@ -76,24 +76,24 @@ class MainActivity : BaseActivity(), MainView {
         resumeAdapter = ResumeAdapter(arrayOf())
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
 
-        swipeRefreshLayout!!.setOnRefreshListener { mainPresenter!!.refreshListRequested() }
-        recyclerView!!.layoutManager = LinearLayoutManager(this)
-        recyclerView!!.adapter = resumeAdapter
+        swipeRefreshLayout.setOnRefreshListener { mainPresenter.refreshListRequested() }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = resumeAdapter
     }
 
     /**
      * Perform dependency injection
      */
     public override fun inject() {
-        (application as MainApplication).component!!.inject(this)
-        (application as MainApplication).component!!.inject(mainPresenter as MainPresenter)
+        (application as MainApplication).component.inject(this)
+        (application as MainApplication).component.inject(mainPresenter as MainPresenter)
     }
 
     /**
      * Tell the presenter to use this view
      */
     override fun provideViewForPresenter() {
-        mainPresenter!!.setView(this)
+        mainPresenter.setView(this)
     }
     //endregion
 
@@ -105,7 +105,7 @@ class MainActivity : BaseActivity(), MainView {
      * @param title Title text
      */
     override fun setTitle(title: String) {
-        toolbar!!.title = title
+        toolbar.title = title
     }
 
     /**
@@ -117,39 +117,14 @@ class MainActivity : BaseActivity(), MainView {
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * Hides displayed error message
-     */
-    override fun hideError() {
-
-    }
-
-    /**
-     * Displays progress with message
-     *
-     * @param progressMessage Progress message text
-     */
-    override fun showProgress(progressMessage: String?) {
-
-    }
-
-    /**
-     * Hide displayed progress
-     */
-    override fun hideProgress() {
-
-    }
-
 
     /**
      * Renders ResumeSection[] object
      * @param resume object
      */
     override fun renderResume(resume: Array<ResumeSection>) {
-        if (resumeAdapter != null) {
-            resumeAdapter!!.setData(resume)
-            resumeAdapter!!.notifyDataSetChanged()
-        }
+        resumeAdapter.setData(resume)
+        resumeAdapter.notifyDataSetChanged()
     }
 
     /**
@@ -158,7 +133,7 @@ class MainActivity : BaseActivity(), MainView {
      */
     @Synchronized
     override fun setRefreshing(value: Boolean) {
-        swipeRefreshLayout!!.isRefreshing = value
+        swipeRefreshLayout.isRefreshing = value
     }
     //endregion
 }
